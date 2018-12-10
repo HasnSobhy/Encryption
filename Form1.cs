@@ -885,52 +885,7 @@ namespace WindowsFormsApp1
             }
             return sb1.ToString();
         }
-        /*
-        public string XOR(string right,string key)
-        {
-            if (right.Length == key.Length)
-            {
-                long x = long.Parse(toBinary(right));
-                long y = long.Parse(toBinary(key));
-                long z = x ^ y;
-                string result = Convert.ToString(z, 2);
-                while (result.Length < right.Length)
-                {
-                    result = "0" + result;
-                }
-                return result;         //result in form of 0 ,1 
-            }
-
-            else
-            {
-                return null;
-            }
-        }
-        */
-        /*
-            public string XOR(string right, string key)
-            {
-
-
-                string result = string.Empty;
-                StringBuilder s1 = new StringBuilder(right);
-                for (int i = 0; i < right.Length; i++)
-                {
-                    if (right[i] == key[i])
-                    {
-                        s1[i] = '0';
-                    }
-                    else
-                    {
-                        s1[i] = '1';
-                    }
-                }
-                result = s1.ToString();
-                return result;
-
-            }
-            */
-
+       
 
         private static String XOR(String firstPar, String secondPar)
         {
@@ -1036,7 +991,7 @@ namespace WindowsFormsApp1
             {
                 byteList.Add(Convert.ToByte(data.Substring(i, 8), 2));
             }
-            return Encoding.ASCII.GetString(byteList.ToArray());
+            return Encoding.Default.GetString(byteList.ToArray());
         }
 
 
