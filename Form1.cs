@@ -44,6 +44,7 @@ namespace WindowsFormsApp1
         string leftPlain, rightPlain;
 
 
+
         byte[] PC1 = new byte[]{57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51,
                 43, 35, 27, 19, 11, 3, 60, 52, 44, 36, 63, 55, 47, 39, 31, 23, 15, 7, 62, 54, 46, 38, 30,
                 22, 14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28, 20, 12, 4};
@@ -75,7 +76,8 @@ namespace WindowsFormsApp1
 
 
 
-
+        int phi;
+        int p, q, e;
 
         public Form1()
         {
@@ -89,6 +91,7 @@ namespace WindowsFormsApp1
             comboBox1.Items.Add("Play Faire");
             comboBox1.Items.Add("DES");
             comboBox1.Items.Add("RC4");
+            comboBox1.Items.Add("RSA");
 
         }
 
@@ -99,7 +102,10 @@ namespace WindowsFormsApp1
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            if (comboBox1.Text == "RSA")
+            {
+                textBox1.Text = 7.ToString();
+            }
         }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
@@ -123,15 +129,10 @@ namespace WindowsFormsApp1
 
         private void button3_Click(object sender, EventArgs e)
         {
-
-
-
             button3WasClicked = true;
             richTextBox1.Text = "";
             richTextBox2.Text = "";
             label5.Text = "";
-
-
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -144,11 +145,11 @@ namespace WindowsFormsApp1
             {
                 textBox1.MaxLength = 8;
 
-            }  
-                DesKey = textBox1.Text;
+            }
+            DesKey = textBox1.Text;
 
-            
-            
+
+
         }
         private void button2_Click(object sender, EventArgs e)
         {
@@ -210,7 +211,8 @@ namespace WindowsFormsApp1
                                         index = index + 26;
                                     }
 
-                                    CIPHERTEXT.Add(loalpha[index]);   //added the index of the new character to list 
+                                    CIPHERTEXT.Add(loalpha[index]);   //added the index of the new character to list
+                                    break;
 
                                 }
 
@@ -225,6 +227,7 @@ namespace WindowsFormsApp1
                                         index = index + 26;
                                     }
                                     CIPHERTEXT.Add(upalpha[index]);
+                                    break;
                                 }
 
 
@@ -233,10 +236,7 @@ namespace WindowsFormsApp1
                         }
 
                     }
-                    label5.Text = "<<<<";
-                    label5.ForeColor = Color.Red;
-                    label5.BackColor = Color.White;
-
+                    
                     plaintext = CIPHERTEXT.ToArray();                 //convert list to array of character
 
                     richTextBox1.Text = new String(plaintext);   //convert array of character to string 
@@ -255,6 +255,10 @@ namespace WindowsFormsApp1
                 {
 
                     richTextBox1.Text = RC4decrypt(richTextBox2.Text, textBox1.Text);
+                }
+                else if (comboBox1.Text == "RSA")
+                {
+                    richTextBox1.Text = RSADEcrypt(richTextBox2.Text);
                 }
             }
 
@@ -320,6 +324,7 @@ namespace WindowsFormsApp1
                                     index = (key + i) % 26;
 
                                     CTEXT.Add(loalpha[index]);         //added the index of the new character to list 
+                                    break;
 
                                 }
 
@@ -330,6 +335,7 @@ namespace WindowsFormsApp1
                                 {
                                     index = (key + i) % 26;
                                     CTEXT.Add(upalpha[index]);
+                                    break;
                                 }
 
 
@@ -341,17 +347,7 @@ namespace WindowsFormsApp1
 
                     ctext = CTEXT.ToArray();                 //convert list to array 
                     richTextBox2.Text = new String(ctext);   //convert array of character to string 
-                    while (!(button3WasClicked))
-                    {
-                        label5.Text = ">>>>";
-                        label5.ForeColor = Color.Red;
-                        label5.BackColor = Color.Black;
-                        Thread.Sleep(500);
-                        label5.ForeColor = Color.Blue;
-                        label5.BackColor = Color.White;
-                        Thread.Sleep(500);
-
-                    }
+              
                 }
 
 
@@ -369,6 +365,11 @@ namespace WindowsFormsApp1
                 {
 
                     richTextBox2.Text = RC4Encrypt(richTextBox1.Text, textBox1.Text);
+                }
+                else if (comboBox1.Text == "RSA")
+                {
+
+                    richTextBox2.Text = RSAEncrypt(richTextBox1.Text);
                 }
             }
         }
@@ -837,12 +838,12 @@ namespace WindowsFormsApp1
 
         public void generateKey()
         {
-            
-                 if (textBox1.Text.Length < 8)
-                {
-                    MessageBox.Show("You Should Enter 8 character");
-                }
-            
+
+            if (textBox1.Text.Length < 8)
+            {
+                MessageBox.Show("You Should Enter 8 character");
+            }
+
             DesKey = StringToBinary(DesKey);
 
             DesKey = permute(DesKey, PC1);
@@ -885,7 +886,8 @@ namespace WindowsFormsApp1
             }
             return sb1.ToString();
         }
-       
+
+
 
         private static String XOR(String firstPar, String secondPar)
         {
@@ -914,7 +916,7 @@ namespace WindowsFormsApp1
         {
             int num, binary_val, decimal_val = 0, base_val = 1, rem;
 
-            num = int.Parse(binary); /* maximum five digits */
+            num = int.Parse(binary);
             binary_val = num;
             while (num > 0)
             {
@@ -929,12 +931,12 @@ namespace WindowsFormsApp1
         //from 48bit to 32bit
         private String SBOX(String newright)
         {
-            if (newright.Length != 48)
-            {
-                return null;
-            }
-
-            int row, coulm, sboxValue, x, y;
+               if (newright.Length != 48)
+               {
+                   return null;
+               }
+               
+            int row, coulm, sboxValue;
 
             StringBuilder sb = new StringBuilder();
             string sub6char, str, fresult;
@@ -951,10 +953,10 @@ namespace WindowsFormsApp1
                 s.Clear();
 
                 str = sub6char.Substring(1, 4).ToString();
-                  coulm = binaryToDecimal(str);
-               // coulm = Convert.ToInt32(str);
+                coulm = binaryToDecimal(str);
+                // coulm = Convert.ToInt32(str);
 
-                 sboxValue = (row * 16) + coulm;
+                sboxValue = (row * 16) + coulm;
                 sboxValue = S_BOX[i / 6, sboxValue];
                 fresult = Convert.ToString(sboxValue, 2);
 
@@ -970,9 +972,9 @@ namespace WindowsFormsApp1
             return rightPlain;
         }
 
-     
-      public static string StringToBinary(string data)
-          {
+
+        public static string StringToBinary(string data)
+        {
             StringBuilder sb = new StringBuilder();
 
             foreach (char c in data.ToCharArray())
@@ -980,7 +982,7 @@ namespace WindowsFormsApp1
                 sb.Append(Convert.ToString(c, 2).PadLeft(8, '0'));
             }
             return sb.ToString();
-          }
+        }
 
 
         public static string BinaryToString(string data)
@@ -991,9 +993,12 @@ namespace WindowsFormsApp1
             {
                 byteList.Add(Convert.ToByte(data.Substring(i, 8), 2));
             }
-            return Encoding.Default.GetString(byteList.ToArray());
+            //return Encoding.Default.GetString(byteList.ToArray());
+             return ASCIIEncoding.Default.GetString(byteList.ToArray()).ToString();
+            
         }
-
+            
+        
 
         public string DesEncrypt(string mesage)
         {
@@ -1003,16 +1008,15 @@ namespace WindowsFormsApp1
 
             generateKey();
 
-           if (mesage.Length % 8 != 0)
-                for (int i = 0; i < mesage.Length % 8; i++)
-                
-                    mesage += "0";
-                    
+            while (mesage.Length % 8 != 0)
+
+                mesage += " ";
 
             StringBuilder resu = new StringBuilder();
             for (int p = 0; p < mesage.Length / 8; p++)
             {
-                plain = mesage.Substring(8 * p ,  8);
+
+                plain = mesage.Substring(8 * p, 8);
                 plain = StringToBinary(plain);
                 plain = permute(plain, IP);
                 leftPlain = plain.Substring(0, plain.Length / 2);
@@ -1022,64 +1026,55 @@ namespace WindowsFormsApp1
                 for (int i = 0; i < 16; i++)
                 {
                     mixer(subKeys[i]);
-                    
-
 
                 }
                 strperm = rightPlain + leftPlain;
-               
+
                 final = permute(strperm, IP_INVERSE);
                 final = BinaryToString(final);
                 resu.Append(final);
-
-
             }
             return resu.ToString();
 
-
-         
-
-
         }
 
-        public string DesDEcrypt(string cipher)
+        public string DesDEcrypt(string mesage)
         {
 
-           
 
             string plain;
             string strperm;
             string final;
 
-           
-
             StringBuilder resu = new StringBuilder();
-
-            for (int p = 0; p < cipher.Length / 8; p++)
+            for (int p = 0; p < mesage.Length / 8; p++)
             {
-                plain = cipher.Substring(8 * p, 8);
+
+                plain = mesage.Substring(8 * p, 8);
                 plain = StringToBinary(plain);
                 plain = permute(plain, IP);
                 leftPlain = plain.Substring(0, plain.Length / 2);
                 rightPlain = plain.Substring(plain.Length / 2);
 
 
-                for (int i = 15;i>=0; i--)
+                for (int i = 15; i >= 0; i--)
                 {
                     mixer(subKeys[i]);
 
                 }
-
                 strperm = rightPlain + leftPlain;
-               
-                strperm = permute(strperm, IP_INVERSE);
-                final = BinaryToString(strperm);
-               resu.Append(final);
 
+                final = permute(strperm, IP_INVERSE);
+                final = BinaryToString(final);
+                resu.Append(final);
+            }
+
+
+            while (resu.ToString()[resu.Length - 1].ToString() == " ")
+            {
+                resu.Remove(resu.Length - 1, 1);
             }
             return resu.ToString();
-
-
 
         }
 
@@ -1125,6 +1120,81 @@ namespace WindowsFormsApp1
 
 
         }
+
+
+        public int Cal_d()
+        {
+            int new_phi = phi + 1;
+            while (true)
+            {
+                if (new_phi % e == 0)
+                {
+                    return new_phi / e;
+                }
+                else
+                {
+                    new_phi += phi;
+                }
+
+            }
+        }
+
+        public string RSAEncrypt(string ms)
+        {
+            p = 13;
+            q = 17;
+            int n = p * q;
+            phi = (p - 1) * (q - 1);
+
+            e = int.Parse(textBox1.Text);
+
+
+            while (e < phi)
+            {
+                if (phi % e != 0)
+                {
+                    break;
+                }
+                else
+                    e++;
+            }
+            //calculate d
+            int d = Cal_d();
+            int x = Int32.Parse(ms);
+
+
+            return (Math.Pow(x, e) % n).ToString();
+
+
+        }
+        public string RSADEcrypt(string ms)
+        {
+            p = 13;
+            q = 17;
+            int n = p * q;
+            phi = (p - 1) * (q - 1);
+
+            e = int.Parse(textBox1.Text);
+
+
+            while (e < phi)
+            {
+                if (phi % e != 0)
+                {
+                    break;
+                }
+                else
+                    e++;
+            }
+
+            //calculate d
+            int d = Cal_d();
+            int x = Int32.Parse(ms);
+
+            return (Math.Pow(x, d) % n).ToString();
+
+
+
+        }
     }
 }
-
